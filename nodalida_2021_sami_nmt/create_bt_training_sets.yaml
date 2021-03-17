@@ -1,0 +1,213 @@
+common:
+    output_directory: data
+
+steps:
+
+  - type: remove_duplicates
+    parameters:
+        inputs:
+            - se_mono.txt
+        outputs:
+            - no_dub_se_mono.txt
+
+
+  - type: filter
+    parameters:
+        inputs: [no_dub_se_mono.txt]
+        outputs: [filt_no_dub_se_mono.txt]
+        filters:
+            - LengthFilter:
+                unit: word
+                min_length: 1
+                max_length: 100
+
+            - LongWordFilter:
+                threshold: 40
+
+            - HtmlTagFilter: {}
+
+            - CharacterScoreFilter:
+                scripts: [Latin]
+                thresholds: [1]
+            
+            - LanguageIDFilter:
+                id_method: langid
+                languages: [se]
+
+
+  - type: filter
+    parameters:
+        inputs: [nmt_bt.translation.fi, filt_no_dub_se_mono.txt]
+        outputs: [filt_nmt_bt.translation.fi, filt_nmt_bt.translation.se]
+        filters:
+            - LengthFilter:
+                unit: word
+                min_length: 1
+                max_length: 100
+
+            - LongWordFilter:
+                threshold: 40
+
+            - HtmlTagFilter: {}
+
+            - NonZeroNumeralsFilter: {}
+
+            - TerminalPunctuationFilter: {}
+            
+            - LengthRatioFilter:
+                threshold: 3
+
+  - type: filter
+    parameters:
+        inputs: [apertium.fi, apertium.se]
+        outputs: [filt_apertium.fi, filt_apertium.se]
+        filters:
+            - LengthFilter:
+                unit: word
+                min_length: 1
+                max_length: 100
+
+            - LongWordFilter:
+                threshold: 40
+
+            - HtmlTagFilter: {}
+
+            - NonZeroNumeralsFilter: {}
+
+            - TerminalPunctuationFilter: {}
+            
+            - LengthRatioFilter:
+                threshold: 3
+
+  - type: concatenate
+    parameters:
+        inputs: [train.fi, nmt_bt.translation.fi]
+        output: nmt_all_bt.fi
+
+  - type: concatenate
+    parameters:
+        inputs: [train.se, nmt_bt.translation.se]
+        output: nmt_all_bt.se
+
+  - type: remove_duplicates
+    parameters:
+        inputs:
+            - nmt_all_bt.fi
+            - nmt_all_bt.se
+        outputs:
+            - nodup_nmt_all_bt.fi
+            - nodup_nmt_all_bt.se
+
+  - type: concatenate
+    parameters:
+        inputs: [train.fi, filt_nmt_bt.translation.fi]
+        output: nmt_clean_bt.fi
+
+  - type: concatenate
+    parameters:
+        inputs: [train.se, filt_nmt_bt.translation.se]
+        output: nmt_clean_bt.se
+
+  - type: remove_duplicates
+    parameters:
+        inputs:
+            - nmt_clean_bt.fi
+            - nmt_clean_bt.se
+        outputs:
+            - nodup_nmt_clean_bt.fi
+            - nodup_nmt_clean_bt.se
+
+  - type: concatenate
+    parameters:
+        inputs: [train.fi, apertium.fi]
+        output: rbmt_all_bt.fi
+
+  - type: concatenate
+    parameters:
+        inputs: [train.se, apertium.se]
+        output: rbmt_all_bt.se
+
+  - type: remove_duplicates
+    parameters:
+        inputs:
+            - rbmt_all_bt.fi
+            - rbmt_all_bt.se
+        outputs:
+            - nodup_rbmt_all_bt.fi
+            - nodup_rbmt_all_bt.se
+
+  - type: concatenate
+    parameters:
+        inputs: [train.fi, filt_apertium.fi]
+        output: rbmt_clean_bt.fi
+
+  - type: concatenate
+    parameters:
+        inputs: [train.se, filt_apertium.se]
+        output: rbmtmt_clean_bt.se
+
+  - type: remove_duplicates
+    parameters:
+        inputs:
+            - rbmt_clean_bt.fi
+            - rbmt_clean_bt.se
+        outputs:
+            - nodup_rbmt_clean_bt.fi
+            - nodup_rbmt_clean_bt.se
+
+  - type: concatenate
+    parameters:
+        inputs: [train.fi, nmt_bt.translation.fi, apertium.fi]
+        output: nmt_all+rbmt_all_bt.fi
+
+  - type: concatenate
+    parameters:
+        inputs: [train.se, nmt_bt.translation.se, apertium.se]
+        output: nmt_all+rbmt_all_bt.se
+
+  - type: remove_duplicates
+    parameters:
+        inputs:
+            - nmt_all+rbmt_all_bt.fi
+            - nmt_all+rbmt_all_bt.se
+        outputs:
+            - nodup_nmt_all+rbmt_all_bt.fi
+            - nodup_nmt_all+rbmt_all_bt.se
+
+  - type: concatenate
+    parameters:
+        inputs: [train.fi, filt_nmt_bt.translation.fi, filt_apertium.fi]
+        output: nmt_clean+rbmt_clean_bt.fi
+
+  - type: concatenate
+    parameters:
+        inputs: [train.se, filt_nmt_bt.translation.se, filt_apertium.se]
+        output: nmt_clean+rbmt_clean_bt.se
+
+  - type: remove_duplicates
+    parameters:
+        inputs:
+            - nmt_clean+rbmt_clean_bt.fi
+            - nmt_clean+rbmt_clean_bt.se
+        outputs:
+            - nodup_nmt_clean+rbmt_clean_bt.fi
+            - nodup_nmt_clean+rbmt_clean_bt.se
+
+  - type: concatenate
+    parameters:
+        inputs: [train.fi, filt_nmt_bt.translation.fi, apertium.fi]
+        output: nmt_clean+rbmt_all_bt.fi
+
+  - type: concatenate
+    parameters:
+        inputs: [train.se, filt_nmt_bt.translation.se, apertium.se]
+        output: nmt_clean+rbmt_all_bt.se
+
+  - type: remove_duplicates
+    parameters:
+        inputs:
+            - nmt_clean+rbmt_all_bt.fi
+            - nmt_clean+rbmt_all_bt.se
+        outputs:
+            - nodup_nmt_clean+rbmt_all_bt.fi
+            - nodup_nmt_clean+rbmt_all_bt.se

@@ -1,0 +1,96 @@
+common:
+    output_directory: data
+
+steps:
+
+  - type: remove_duplicates
+    parameters:
+        inputs:
+            - finsme.fi-sme.fi
+            - finsme.fi-sme.sme
+        outputs:
+            - nodup_finsme.fi-sme.fi
+            - nodup_finsme.fi-sme.se
+
+  - type: filter
+    parameters:
+        inputs:
+            - nodup_finsme.fi-sme.fi
+            - nodup_finsme.fi-sme.se
+        outputs:
+            - filt_nodup_finsme.fi-sme.fi
+            - filt_nodup_finsme.fi-sme.se
+        filters:
+            - LengthFilter:
+                unit: word
+                min_length: 1
+                max_length: 100
+
+            - LengthRatioFilter:
+                threshold: 3
+
+            - LongWordFilter:
+                threshold: 40
+
+            - HtmlTagFilter: {}
+
+            - NonZeroNumeralsFilter: {}
+
+            - TerminalPunctuationFilter: {}
+
+            - CharacterScoreFilter:
+                scripts: [Latin, Latin]
+                thresholds: [1, 1]
+            
+            - LanguageIDFilter:
+                id_method: langid
+                languages: [fi, se]
+
+  - type: subset
+    parameters:
+        inputs:
+            - filt_nodup_finsme.fi-sme.fi
+            - filt_nodup_finsme.fi-sme.se
+        outputs:
+            - test.fi
+            - test.se
+        size: 2000
+           
+  - type: remove_duplicates
+    parameters:
+        inputs:
+            - filt_nodup_finsme.fi-sme.fi
+            - filt_nodup_finsme.fi-sme.se
+        outputs:
+            - train_pre.fi
+            - train_pre.se
+        overlap:
+            - data/test.fi
+            - data/test.se
+
+  - type: subset
+    parameters:
+        inputs:
+            - train_pre.fi
+            - train_pre.se
+        outputs:
+            - dev.fi
+            - dev.se
+        size: 2000
+           
+  - type: remove_duplicates
+    parameters:
+        inputs:
+            - train_pre.fi
+            - train_pre.se
+        outputs:
+            - train.fi
+            - train.se
+        overlap:
+            - data/dev.fi
+            - data/dev.se
+
+
+
+
+
