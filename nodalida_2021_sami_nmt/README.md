@@ -1,6 +1,6 @@
 # NoDaLiDa 2021 fin-sme NMT with backtranslations
 
-This directory contains parallel training, development and test sets and [OpusFilter](https://github.com/Helsinki-NLP/OpusFilter) configuration files for creating backtranslations training sets as described in the NoDaLiDa 2021 paper (link will be added later).
+This directory contains parallel training, development and test sets and [OpusFilter](https://github.com/Helsinki-NLP/OpusFilter) configuration files for creating backtranslations training sets as described in the [NoDaLiDa 2021 paper](https://aclanthology.org/2021.nodalida-main.37/).
 
 ## Data sets
 
