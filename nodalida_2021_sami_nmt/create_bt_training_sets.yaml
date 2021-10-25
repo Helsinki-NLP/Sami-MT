@@ -86,7 +86,7 @@ steps:
 
   - type: concatenate
     parameters:
-        inputs: [train.se, nmt_bt.translation.se]
+        inputs: [train.se, filt_no_dub_se_mono.txt]
         output: nmt_all_bt.se
 
   - type: remove_duplicates
@@ -144,7 +144,7 @@ steps:
   - type: concatenate
     parameters:
         inputs: [train.se, filt_apertium.se]
-        output: rbmtmt_clean_bt.se
+        output: rbmt_clean_bt.se
 
   - type: remove_duplicates
     parameters:
@@ -162,7 +162,7 @@ steps:
 
   - type: concatenate
     parameters:
-        inputs: [train.se, nmt_bt.translation.se, apertium.se]
+        inputs: [train.se, filt_no_dub_se_mono.txt, apertium.se]
         output: nmt_all+rbmt_all_bt.se
 
   - type: remove_duplicates
